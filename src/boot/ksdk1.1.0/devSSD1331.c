@@ -116,30 +116,39 @@ devSSD1331init(void)
 	writeCommand(kSSD1331CommandCLOCKDIV);		// 0xB3
 	writeCommand(0xF0);				// 7:4 = Oscillator Frequency, 3:0 = CLK Div Ratio (A[3:0]+1 = 1..16)
 	writeCommand(kSSD1331CommandPRECHARGEA);	// 0x8A
-	writeCommand(0x64);
+	writeCommand(0xFF);
+	// writeCommand(0x64);
 	writeCommand(kSSD1331CommandPRECHARGEB);	// 0x8B
-	writeCommand(0x78);
+	writeCommand(0xFF);
+	// writeCommand(0x78);
 	writeCommand(kSSD1331CommandPRECHARGEA);	// 0x8C
-	writeCommand(0x64);
+	writeCommand(0xFF);
+	// writeCommand(0x64);
 	writeCommand(kSSD1331CommandPRECHARGELEVEL);	// 0xBB
-	writeCommand(0x3A);
+	writeCommand(0x3E);
 	writeCommand(kSSD1331CommandVCOMH);		// 0xBE
 	writeCommand(0x3E);
 	writeCommand(kSSD1331CommandMASTERCURRENT);	// 0x87
-	writeCommand(0x06);
+	// Making the master current to the top value:
+	// writeCommand(0x06);
+	writeCommand(0x0F);
 	writeCommand(kSSD1331CommandCONTRASTA);		// 0x81
-	writeCommand(0x91);
+	// Setting all contrasts to maximum 80h
+	// writeCommand(0x91);
+	writeCommand(0xFF);
 	writeCommand(kSSD1331CommandCONTRASTB);		// 0x82
-	writeCommand(0x50);
+	// writeCommand(0x50);
+	writeCommand(0xFF);
 	writeCommand(kSSD1331CommandCONTRASTC);		// 0x83
-	writeCommand(0x7D);
+	// writeCommand(0x7D);
+	writeCommand(0xFF);
 	writeCommand(kSSD1331CommandDISPLAYON);		// Turn on oled panel
 
 	/*
 	 *	To use fill commands, you will have to issue a command to the display to enable them. See the manual.
 	 */
 	writeCommand(kSSD1331CommandFILL);
-	writeCommand(0x01);
+	writeCommand(0x11);
 
 	/*
 	 *	Clear Screen
@@ -150,11 +159,23 @@ devSSD1331init(void)
 	writeCommand(0x5F);
 	writeCommand(0x3F);
 
+		/*
+		 *	Any post-initialization drawing commands go here.
+		 */
+// Three sub-pixels for color A, B and C have 6 bits, 5 bits and 6 bits respectively.
+// 00h to 5Fh for columns, 00h to 3Fh for rows
+	writeCommand(kSSD1331CommandDRAWRECT);
+	writeCommand(0x00);
+	writeCommand(0x00);
+	writeCommand(0x5F);
+	writeCommand(0x3F);
+	writeCommand(0x00);
+	writeCommand(0x3E);
+	writeCommand(0x00);
+	writeCommand(0x00);
+	writeCommand(0x3E);
+	writeCommand(0x00);
 
-
-	/*
-	 *	Any post-initialization drawing commands go here.
-	 */
 	//...
 
 
