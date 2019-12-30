@@ -85,10 +85,26 @@ writeCommand(uint8_t commandByte)
 // static const uint8_t HIEGHT = 0x3F;
 
 void
-drawRect(uint8_t start_x, uint8_t start_y, uint8_t width_x, uint8_t width_y, uint8_t * color_pointer) {
-	uint8_t red = *color_pointer;
-	uint8_t green = *color_pointer++;
-	uint8_t blue = *color_pointer++;
+drawLine(uint8_t start_x, uint8_t start_y, uint8_t end_x, uint8_t end_y, uint8_t * colours){
+	uint8_t red = colours[0];
+	uint8_t green = colours[1];
+	uint8_t blue = colours[2];
+	writeCommand(kSSD1331CommandDRAWLINE);
+	writeCommand(start_x);
+	writeCommand(start_y);
+	writeCommand(end_x);
+	writeCommand(end_y);
+	writeCommand(blue);
+	writeCommand(green);
+	writeCommand(red);
+
+}
+
+void
+drawRect(uint8_t start_x, uint8_t start_y, uint8_t width_x, uint8_t width_y, uint8_t * colours) {
+	uint8_t red = colours[0];
+	uint8_t green = colours[1];
+	uint8_t blue = colours[2];
 
 	writeCommand(kSSD1331CommandDRAWRECT);
 	writeCommand(start_x);
@@ -123,31 +139,40 @@ drawChar(uint8_t x, uint8_t y, uint16_t c, uint8_t * colour, uint8_t * bg, uint8
 			uint8_t line = font[c * 5 + i];
 			for(int8_t j=0; j<8; j++, line >>= 1) {
 					if(line & 1) {
-						drawRect(x+i*size_x, y+j*size_y, size_x, size_y, colour);
-					} else if(bg != colour) {
-						drawRect(x+i*size_x, y+j*size_y, size_x, size_y, bg);
-					}
+						if (size_x ==1 && size_y==1){
+							drawLine(x+i, y+j,x+i,y+j,colour);
+						} else{
+							drawRect(x+i*size_x, y+j*size_y, size_x, size_y, colour);
+						}
+					} //else if(bg != colour) {
+						//drawRect(x+i*size_x, y+j*size_y, size_x, size_y, bg);
+					//}
 			}
-			if(bg != colour) { // If opaque, draw vertical line for last column
-					drawRect(x+5*size_x, y, size_x, 8*size_y, bg);
-			}
+			// Commenting out all background colour lines to speed up writing
+			// if(bg != colour) { // If opaque, draw vertical line for last column
+			// 		drawRect(x+5*size_x, y, size_x, 8*size_y, bg);
+			// }
 	}
 }
 
 
 void
-writeText(uint8_t c) {
-	if (c =='\n'){
-		cursor_x = 0;
-		cursor_y += textsize_y;
-	} else if(c != '\r') {                 // Ignore carriage returns
-			if(wrap && ((cursor_x + textsize_x * 6) > width)) { // Off right?
-					cursor_x  = 0;                 // Reset x to zero,
-					cursor_y += textsize_y * 8;    // advance y one line
-			}
-			drawChar(cursor_x, cursor_y, c, textcolor, textbg, textsize_x, textsize_y);
-			cursor_x += textsize_x * 6;          // Advance x one char
+writeText(uint8_t * txt) {
+	for (uint8_t i = 0; txt[i]; i++){
+		uint8_t c = txt[i];
+		if (c=='\n'){
+			cursor_x = 0;
+			cursor_y += textsize_y*8;
+		} else if(c!= '\r') {                 // Ignore carriage returns
+				if(wrap && ((cursor_x + textsize_x * 6) > width)) { // Off right?
+						cursor_x  = 0;                 // Reset x to zero,
+						cursor_y += textsize_y * 8;    // advance y one line
+				}
+				drawChar(cursor_x, cursor_y, c, textcolor, textbg, textsize_x, textsize_y);
+				cursor_x += textsize_x * 6;          // Advance x one char
+		}
 	}
+
 }
 
 
@@ -271,15 +296,33 @@ devSSD1331init(void)
 
 	//...
 
-	textcolor[0] = 0x00 ;
+	textcolor[0] = 0x3E ;
 	textcolor[1] = 0x3E ;
-	textcolor[2] = 0x00 ;
+	textcolor[2] = 0x3E ;
 	textbg[0] = 0x00;
 	textbg[1] = 0x00;
 	textbg[2] = 0x00;
 
+	unsigned char text[] = "kill\n";
+	writeText(text);
+	textsize_x=2;
+	textsize_y=2;
+	unsigned char text2[] = "me\n";
+	writeText(text2);
 
-	writeText(91);
+	textsize_x=3;
+	textsize_y=3;
+	unsigned char text3[] = "now";
+	writeText(text3);
+	// textcolor[0] = 0x3E ;
+	// textcolor[1] = 0x3E ;
+	// textcolor[2] = 0x00 ;
+	// writeText('m');
+	// textcolor[0] = 0x30 ;
+	// textcolor[1] = 0x30 ;
+	// textcolor[2] = 0x30 ;
+	// writeText('s');
+
 
 	return 0;
 }
