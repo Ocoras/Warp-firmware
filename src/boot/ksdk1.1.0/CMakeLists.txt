@@ -108,6 +108,7 @@ ADD_EXECUTABLE(Warp
 #    "${ProjDirPath}/../../src/devAS7263.c"
     # My two new lines here for the SSD1331 C files:
     "${ProjDirPath}/../../src/devSSD1331.h"
+    "${ProjDirPath}/../../src/devSSD1331_font.h"
     "${ProjDirPath}/../../src/devSSD1331.c"
     # My two new lines here for the INA219 C files:
     "${ProjDirPath}/../../src/devINA219.h"

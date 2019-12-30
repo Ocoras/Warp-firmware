@@ -8,9 +8,11 @@
 #include "warp.h"
 #include "devSSD1331.h"
 
+// #include "gfxfont.h"
+#include "devSSD1331_font.h"
+
 volatile uint8_t	inBuffer[1];
 volatile uint8_t	payloadBytes[1];
-
 
 /*
  *	Override Warp firmware's use of these pins and define new aliases.
@@ -24,8 +26,9 @@ enum
 	kSSD1331PinRST		= GPIO_MAKE_PIN(HW_GPIOB, 0),
 };
 
+
 static int
-writeCommand(uint8_t commandByte)
+SSD1331::writeCommand(uint8_t commandByte)
 {
 	spi_status_t status;
 
@@ -59,28 +62,83 @@ writeCommand(uint8_t commandByte)
 	return status;
 }
 
+
+
+// static const uint8_t WIDTH = 0x5F;
+// static const uint8_t HIEGHT = 0x3F;
+
 void
-singleNumber(uint8_t numToDisplay){
-	switch (numToDisplay) {
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-		case 9:
-		{
-			
-		}
+SSD1331::drawRect(uint8_t start_x, uint8_t start_y, uint8_t width_x, uint8_t width_y, uint8_t * color_pointer) {
+	uint8_t red = *color_pointer;
+	uint8_t green = *color_pointer++;
+	uint8_t blue = *color_pointer++;
+
+	writeCommand(kSSD1331CommandDRAWRECT);
+	writeCommand(start_x);
+	writeCommand(start_y);
+	writeCommand(start_x + width_x);
+	writeCommand(start_y + width_y);
+	// Border - assume same as rect.
+	writeCommand(blue);
+	writeCommand(green);
+	writeCommand(red);
+	// Rect
+	writeCommand(blue);
+	writeCommand(green);
+	writeCommand(red);
+
+}
+
+
+
+// Implementing writing to screen based on implementation in Adafruit_GFX Library:
+void
+SSD1331::drawChar(uint8_t x, uint8_t y, uint16_t c, uint8_t * colour, uint8_t * bg, uint8_t size_x, uint8_t size_y){
+
+	if((x >= width)            || // Clip right - Assuming horizontal screen
+		 (y >= height)           || // Clip bottom
+		 ((x + 6 * size_x - 1) < 0) || // Clip left
+		 ((y + 8 * size_y - 1) < 0))   // Clip top
+			return;
+
+	for(int8_t i=0; i<5; i++ ) { // Char bitmap = 5 columns
+			// ToDo : Store font in program memory & implement the line reader function from the program memory:
+			uint8_t line = font[c * 5 + i];
+			for(int8_t j=0; j<8; j++, line >>= 1) {
+					if(line & 1) {
+						drawRect(x+i*size_x, y+j*size_y, size_x, size_y, colour);
+					} else if(bg != colour) {
+						drawRect(x+i*size_x, y+j*size_y, size_x, size_y, bg);
+					}
+			}
+			if(bg != colour) { // If opaque, draw vertical line for last column
+					drawRect(x+5*size_x, y, size_x, 8*size_y, bg);
+			}
 	}
 }
 
 
+void
+SSD1331::writeText(uint8_t c) {
+	if (c =='\n'){
+		cursor_x = 0;
+		cursor_y += textsize_y
+	} else if(c != '\r') {                 // Ignore carriage returns
+			if(wrap && ((cursor_x + textsize_x * 6) > _width)) { // Off right?
+					cursor_x  = 0;                 // Reset x to zero,
+					cursor_y += textsize_y * 8;    // advance y one line
+			}
+			drawChar(cursor_x, cursor_y, c, &textcolor, &textbg, textsize_x, textsize_y);
+			cursor_x += textsize_x * 6;          // Advance x one char
+	}
+}
+
+
+
+
+
 int
-devSSD1331init(void)
+SSD1331::init(void)
 {
 	/*
 	 *	Override Warp firmware's use of these pins.
@@ -182,17 +240,17 @@ devSSD1331init(void)
 		 */
 // Three sub-pixels for color A, B and C have 6 bits, 5 bits and 6 bits respectively.
 // 00h to 5Fh for columns, 00h to 3Fh for rows
-	writeCommand(kSSD1331CommandDRAWRECT);
-	writeCommand(0x00);
-	writeCommand(0x00);
-	writeCommand(0x5F);
-	writeCommand(0x3F);
-	writeCommand(0x00);
-	writeCommand(0x3E);
-	writeCommand(0x00);
-	writeCommand(0x00);
-	writeCommand(0x3E);
-	writeCommand(0x00);
+	// writeCommand(kSSD1331CommandDRAWRECT);
+	// writeCommand(0x00);
+	// writeCommand(0x00);
+	// writeCommand(0x5F);
+	// writeCommand(0x3F);
+	// writeCommand(0x00);
+	// writeCommand(0x3E);
+	// writeCommand(0x00);
+	// writeCommand(0x00);
+	// writeCommand(0x3E);
+	// writeCommand(0x00);
 
 	//...
 
