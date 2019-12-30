@@ -27,8 +27,25 @@ enum
 };
 
 
+uint8_t width = 0x5F;
+uint8_t height = 0x3F;
+uint8_t cursor_x = 0;
+uint8_t cursor_y = 0;
+uint8_t textsize_x = 1;
+uint8_t textsize_y = 1;
+bool wrap = true;
+
+// Colours stored in arrays
+uint8_t textcolor[3];
+uint8_t textbg[3];
+
+
+
+
+
+
 static int
-SSD1331::writeCommand(uint8_t commandByte)
+writeCommand(uint8_t commandByte)
 {
 	spi_status_t status;
 
@@ -68,7 +85,7 @@ SSD1331::writeCommand(uint8_t commandByte)
 // static const uint8_t HIEGHT = 0x3F;
 
 void
-SSD1331::drawRect(uint8_t start_x, uint8_t start_y, uint8_t width_x, uint8_t width_y, uint8_t * color_pointer) {
+drawRect(uint8_t start_x, uint8_t start_y, uint8_t width_x, uint8_t width_y, uint8_t * color_pointer) {
 	uint8_t red = *color_pointer;
 	uint8_t green = *color_pointer++;
 	uint8_t blue = *color_pointer++;
@@ -93,7 +110,7 @@ SSD1331::drawRect(uint8_t start_x, uint8_t start_y, uint8_t width_x, uint8_t wid
 
 // Implementing writing to screen based on implementation in Adafruit_GFX Library:
 void
-SSD1331::drawChar(uint8_t x, uint8_t y, uint16_t c, uint8_t * colour, uint8_t * bg, uint8_t size_x, uint8_t size_y){
+drawChar(uint8_t x, uint8_t y, uint16_t c, uint8_t * colour, uint8_t * bg, uint8_t size_x, uint8_t size_y){
 
 	if((x >= width)            || // Clip right - Assuming horizontal screen
 		 (y >= height)           || // Clip bottom
@@ -119,16 +136,16 @@ SSD1331::drawChar(uint8_t x, uint8_t y, uint16_t c, uint8_t * colour, uint8_t * 
 
 
 void
-SSD1331::writeText(uint8_t c) {
+writeText(uint8_t c) {
 	if (c =='\n'){
 		cursor_x = 0;
-		cursor_y += textsize_y
+		cursor_y += textsize_y;
 	} else if(c != '\r') {                 // Ignore carriage returns
-			if(wrap && ((cursor_x + textsize_x * 6) > _width)) { // Off right?
+			if(wrap && ((cursor_x + textsize_x * 6) > width)) { // Off right?
 					cursor_x  = 0;                 // Reset x to zero,
 					cursor_y += textsize_y * 8;    // advance y one line
 			}
-			drawChar(cursor_x, cursor_y, c, &textcolor, &textbg, textsize_x, textsize_y);
+			drawChar(cursor_x, cursor_y, c, textcolor, textbg, textsize_x, textsize_y);
 			cursor_x += textsize_x * 6;          // Advance x one char
 	}
 }
@@ -138,7 +155,7 @@ SSD1331::writeText(uint8_t c) {
 
 
 int
-SSD1331::init(void)
+devSSD1331init(void)
 {
 	/*
 	 *	Override Warp firmware's use of these pins.
@@ -254,7 +271,15 @@ SSD1331::init(void)
 
 	//...
 
+	textcolor[0] = 0x00 ;
+	textcolor[1] = 0x3E ;
+	textcolor[2] = 0x00 ;
+	textbg[0] = 0x00;
+	textbg[1] = 0x00;
+	textbg[2] = 0x00;
 
+
+	writeText(91);
 
 	return 0;
 }

@@ -1350,10 +1350,10 @@ main(void)
 	 */
 #endif
 	// setup screen with width 5F and height 3F
-	screen = SSD1331(0x5F, 0x3F);
-	screen.init();
-	screen.writeText(0x61);
-	// devSSD1331init();
+	// screen = SSD1331();
+	// screen.init();
+	// screen.writeText(0x61);
+	devSSD1331init();
 
 	while (1)
 	{
