@@ -53,11 +53,11 @@ writeCommand(uint8_t commandByte)
 	 *	Make sure there is a high-to-low transition by first driving high, delay, then drive low.
 	 */
 	GPIO_DRV_SetPinOutput(kSSD1331PinCSn);
-	OSA_TimeDelay(1);
+	// OSA_TimeDelay(1);
 	GPIO_DRV_ClearPinOutput(kSSD1331PinCSn);
 
 	/*
-	 *	Drive DC low (command).
+	 // *	Drive DC low (command).
 	 */
 	GPIO_DRV_ClearPinOutput(kSSD1331PinDC);
 
@@ -293,17 +293,19 @@ devSSD1331init(void)
 	textbg[2] = 0x00;
 
 	textsize_x=3;
-	textsize_y=5;
+	textsize_y=4;
 
-	unsigned char txt[] = "WARP";
+	unsigned char txt[] = "WARP\n";
 	writeText(txt);
 	textsize_x=1;
 	textsize_y=1;
-	writeCommand(kSSD1331CommandCLEAR);
-	writeCommand(0x00);
-	writeCommand(0x00);
-	writeCommand(0x5F);
-	writeCommand(0x3F);
+	unsigned char txt2[] = "adjusted by \nDavid\nSwarbrick";
+	writeText(txt2);
+	// writeCommand(kSSD1331CommandCLEAR);
+	// writeCommand(0x00);
+	// writeCommand(0x00);
+	// writeCommand(0x5F);
+	// writeCommand(0x3F);
 
 
 	return 0;
