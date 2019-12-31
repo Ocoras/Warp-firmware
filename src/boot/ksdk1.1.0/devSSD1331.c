@@ -286,21 +286,6 @@ devSSD1331init(void)
 		/*
 		 *	Any post-initialization drawing commands go here.
 		 */
-// Three sub-pixels for color A, B and C have 6 bits, 5 bits and 6 bits respectively.
-// 00h to 5Fh for columns, 00h to 3Fh for rows
-	// writeCommand(kSSD1331CommandDRAWRECT);
-	// writeCommand(0x00);
-	// writeCommand(0x00);
-	// writeCommand(0x5F);
-	// writeCommand(0x3F);
-	// writeCommand(0x00);
-	// writeCommand(0x3E);
-	// writeCommand(0x00);
-	// writeCommand(0x00);
-	// writeCommand(0x3E);
-	// writeCommand(0x00);
-
-	//...
 
 	textcolor[0] = 0x3E ;
 	textcolor[1] = 0x3E ;
@@ -309,36 +294,18 @@ devSSD1331init(void)
 	textbg[1] = 0x00;
 	textbg[2] = 0x00;
 
-	writeNumber(1);
-	writeNumber(12);
-	writeNumber(123);
-	writeNumber(1234);
-	writeNumber(12345);
-	writeNumber(123456);
-	writeNumber(1234567);
-	writeNumber(12345678);
-	writeNumber(123456789);
+	textsize_x=3;
+	textsize_y=5;
 
-	textsize_x=2;
-	textsize_y=2;
-
-	// textsize_x=2;
-	// textsize_y=2;
-	// unsigned char text2[] = "me\n";
-	// writeText(text2);
-	//
-	// textsize_x=3;
-	// textsize_y=3;
-	// unsigned char text3[] = "now";
-	// writeText(text3);
-	// textcolor[0] = 0x3E ;
-	// textcolor[1] = 0x3E ;
-	// textcolor[2] = 0x00 ;
-	// writeText('m');
-	// textcolor[0] = 0x30 ;
-	// textcolor[1] = 0x30 ;
-	// textcolor[2] = 0x30 ;
-	// writeText('s');
+	unsigned char txt[] = "WARP";
+	writeText(txt);
+	textsize_x=1;
+	textsize_y=1;
+	writeCommand(kSSD1331CommandCLEAR);
+	writeCommand(0x00);
+	writeCommand(0x00);
+	writeCommand(0x5F);
+	writeCommand(0x3F);
 
 
 	return 0;
