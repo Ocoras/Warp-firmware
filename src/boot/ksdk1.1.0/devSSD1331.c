@@ -42,8 +42,6 @@ uint8_t textbg[3];
 
 
 
-
-
 static int
 writeCommand(uint8_t commandByte)
 {
@@ -55,7 +53,7 @@ writeCommand(uint8_t commandByte)
 	 *	Make sure there is a high-to-low transition by first driving high, delay, then drive low.
 	 */
 	GPIO_DRV_SetPinOutput(kSSD1331PinCSn);
-	OSA_TimeDelay(10);
+	OSA_TimeDelay(1);
 	GPIO_DRV_ClearPinOutput(kSSD1331PinCSn);
 
 	/*
@@ -69,7 +67,7 @@ writeCommand(uint8_t commandByte)
 					(const uint8_t * restrict)&payloadBytes[0],
 					(uint8_t * restrict)&inBuffer[0],
 					1		/* transfer size */,
-					1000		/* timeout in microseconds (unlike I2C which is ms) */);
+					100		/* timeout in microseconds (unlike I2C which is ms) */);
 
 	/*
 	 *	Drive /CS high
