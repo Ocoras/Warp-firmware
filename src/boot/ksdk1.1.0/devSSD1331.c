@@ -175,7 +175,13 @@ writeText(uint8_t * txt) {
 
 }
 
-
+void
+writeNumber(uint32_t number) {
+	uint32_t a= number;
+	unsigned char text[10];
+	itoa(a,(char*)text,10);
+	writeText(text);
+}
 
 
 
@@ -303,17 +309,28 @@ devSSD1331init(void)
 	textbg[1] = 0x00;
 	textbg[2] = 0x00;
 
-	unsigned char text[] = "kill\n";
-	writeText(text);
+	writeNumber(1);
+	writeNumber(12);
+	writeNumber(123);
+	writeNumber(1234);
+	writeNumber(12345);
+	writeNumber(123456);
+	writeNumber(1234567);
+	writeNumber(12345678);
+	writeNumber(123456789);
+
 	textsize_x=2;
 	textsize_y=2;
-	unsigned char text2[] = "me\n";
-	writeText(text2);
 
-	textsize_x=3;
-	textsize_y=3;
-	unsigned char text3[] = "now";
-	writeText(text3);
+	// textsize_x=2;
+	// textsize_y=2;
+	// unsigned char text2[] = "me\n";
+	// writeText(text2);
+	//
+	// textsize_x=3;
+	// textsize_y=3;
+	// unsigned char text3[] = "now";
+	// writeText(text3);
 	// textcolor[0] = 0x3E ;
 	// textcolor[1] = 0x3E ;
 	// textcolor[2] = 0x00 ;
