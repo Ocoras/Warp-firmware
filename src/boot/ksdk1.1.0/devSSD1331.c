@@ -23,7 +23,8 @@ enum
 	kSSD1331PinSCK		= GPIO_MAKE_PIN(HW_GPIOA, 9),
 	kSSD1331PinCSn		= GPIO_MAKE_PIN(HW_GPIOB, 13),
 	kSSD1331PinDC		= GPIO_MAKE_PIN(HW_GPIOA, 12),
-	kSSD1331PinRST		= GPIO_MAKE_PIN(HW_GPIOB, 0),
+	// kSSD1331PinRST		= GPIO_MAKE_PIN(HW_GPIOB, 0),
+	kSSD1331PinRST		= GPIO_MAKE_PIN(HW_GPIOA, 2),
 };
 
 
@@ -182,6 +183,15 @@ writeNumber(uint32_t number) {
 }
 
 
+void
+clearScreen(void) {
+	writeCommand(kSSD1331CommandCLEAR);
+	writeCommand(0x00);
+	writeCommand(0x00);
+	writeCommand(0x5F);
+	writeCommand(0x3F);
+}
+
 
 int
 devSSD1331init(void)
@@ -203,7 +213,8 @@ devSSD1331init(void)
 	 */
 	PORT_HAL_SetMuxMode(PORTB_BASE, 13u, kPortMuxAsGpio);
 	PORT_HAL_SetMuxMode(PORTA_BASE, 12u, kPortMuxAsGpio);
-	PORT_HAL_SetMuxMode(PORTB_BASE, 0u, kPortMuxAsGpio);
+	// PORT_HAL_SetMuxMode(PORTB_BASE, 0u, kPortMuxAsGpio);
+	PORT_HAL_SetMuxMode(PORTA_BASE, 2u, kPortMuxAsGpio);
 
 
 	/*
@@ -292,20 +303,13 @@ devSSD1331init(void)
 	textbg[1] = 0x00;
 	textbg[2] = 0x00;
 
+
 	textsize_x=3;
 	textsize_y=4;
-
-	unsigned char txt[] = "WARP\n";
-	writeText(txt);
-	textsize_x=1;
-	textsize_y=1;
-	unsigned char txt2[] = "adjusted by \nDavid\nSwarbrick";
+	unsigned char txt2[] = "WARP";
 	writeText(txt2);
-	// writeCommand(kSSD1331CommandCLEAR);
-	// writeCommand(0x00);
-	// writeCommand(0x00);
-	// writeCommand(0x5F);
-	// writeCommand(0x3F);
+	OSA_TimeDelay(3000);
+	clearScreen();
 
 
 	return 0;
