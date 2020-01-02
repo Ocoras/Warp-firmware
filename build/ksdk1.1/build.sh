@@ -38,6 +38,7 @@
 	cp ../../src/boot/ksdk1.1.0/devSSD1331.*			work/demos/Warp/src/
 	cp ../../src/boot/ksdk1.1.0/devSSD1331_font.*			work/demos/Warp/src/
 	cp ../../src/boot/ksdk1.1.0/devINA219.*				work/demos/Warp/src/
+	cp ../../src/boot/ksdk1.1.0/devAD8318.*				work/demos/Warp/src/
 
 	cd work/lib/ksdk_platform_lib/armgcc/KL03Z4 && ./clean.sh; ./build_release.sh
 	cd ../../../../demos/Warp/armgcc/Warp && ./clean.sh; ./build_release.sh

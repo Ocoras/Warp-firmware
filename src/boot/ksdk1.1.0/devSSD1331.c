@@ -156,7 +156,8 @@ drawChar(uint8_t x, uint8_t y, uint16_t c, uint8_t * colour, uint8_t * bg, uint8
 
 
 void
-writeText(uint8_t * txt) {
+writeText(char * text) {
+	unsigned char * txt = (unsigned char *) text;
 	for (uint8_t i = 0; txt[i]; i++){
 		uint8_t c = txt[i];
 		if (c=='\n'){
@@ -177,8 +178,10 @@ writeText(uint8_t * txt) {
 void
 writeNumber(uint32_t number) {
 	uint32_t a= number;
-	unsigned char text[10];
-	itoa(a,(char*)text,10);
+	// unsigned char text[10];
+	// itoa(a,(char*)text,10);
+	char text[10];
+  itoa(a,text,10);
 	writeText(text);
 }
 
@@ -190,6 +193,8 @@ clearScreen(void) {
 	writeCommand(0x00);
 	writeCommand(0x5F);
 	writeCommand(0x3F);
+	cursor_x = 0;
+	cursor_y = 0;
 }
 
 
@@ -306,10 +311,13 @@ devSSD1331init(void)
 
 	textsize_x=3;
 	textsize_y=4;
-	unsigned char txt2[] = "WARP";
-	writeText(txt2);
-	OSA_TimeDelay(3000);
+	// unsigned char txt2[] = "WARP";
+	// writeText(txt2);
+	writeText("WARP");
+	OSA_TimeDelay(500);
 	clearScreen();
+	textsize_x = 1;
+	textsize_y = 1;
 
 
 	return 0;

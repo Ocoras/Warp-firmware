@@ -55,7 +55,7 @@
 #include "SEGGER_RTT.h"
 #include "warp.h"
 
-#include "devSSD1331.h"
+
 
 #define WARP_FRDMKL03
 
@@ -83,6 +83,8 @@
 #else
 #include "devMMA8451Q.h"
 #include "devINA219.h"
+#include "devSSD1331.h"
+#include "devAD8318.h"
 #endif
 
 #define WARP_BUILD_ENABLE_SEGGER_RTT_PRINTF
@@ -1349,12 +1351,9 @@ main(void)
 	 *	Notreached
 	 */
 #endif
-	// setup screen with width 5F and height 3F
-	// screen = SSD1331();
-	// screen.init();
-	// screen.writeText(0x61);
-	devSSD1331init();
 
+	devSSD1331init();
+	devAD8318init();
 	while (1)
 	{
 
