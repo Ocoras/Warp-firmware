@@ -26,7 +26,7 @@
 // (0U)
 // #define ADC16_TEST_LOOP_CYCLE (4U)
 
-void ADC16_TEST_OneTimeTrigger(uint32_t instance, uint32_t chnGroup, uint8_t chn);
+int32_t ADC16_TEST_OneTimeTrigger(uint32_t instance, uint32_t chnGroup, uint8_t chn);
 
 // #endif // __ADC16_TEST_H__ //
 

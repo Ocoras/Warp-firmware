@@ -22,7 +22,7 @@ enum
 };
 
 // Function copied from Kinetis SDK 1.1 API Reference Manual
-void ADC16_TEST_OneTimeTrigger(uint32_t instance, uint32_t chnGroup, uint8_t chn)
+int32_t ADC16_TEST_OneTimeTrigger(uint32_t instance, uint32_t chnGroup, uint8_t chn)
 {
 #if FSL_FEATURE_ADC16_HAS_CALIBRATION
 	// The MKL03Z4 does have calibration and this is defined in line 85 of:
@@ -63,12 +63,14 @@ void ADC16_TEST_OneTimeTrigger(uint32_t instance, uint32_t chnGroup, uint8_t chn
 		ADC16_DRV_WaitConvDone(instance, chnGroup);
 		// Fetch the conversion value and format it. //
 		MyAdcValue = ADC16_DRV_GetConvValueRAW(instance, chnGroup);
+		writeNumber((uint32_t)MyAdcValue);
 		// ADC16_DRV_ConvRAWData(MyAdcValue, false, kAdcResolutionBitOfSingleEndAs12) );
 	}
 	// Pause the conversion after testing. //
 	ADC16_DRV_PauseConv(instance, chnGroup);
 	// Disable the ADC. //
 	ADC16_DRV_Deinit(instance);
+	return MyAdcValue;
 }
 
 
@@ -80,12 +82,16 @@ devAD8318init(void)
 	 *
 	 *	Using PTB0 for ADC measurement
 	 */
-
+	int32_t adc_result;
 	PORT_HAL_SetMuxMode(PORTB_BASE, 0, kPortPinDisabled);
 	writeText("Setup PTB0 as ADC\n");
 	writeText("Running ADC Test:\n");
-	ADC16_TEST_OneTimeTrigger();
-	writeText("Run Sucessfully\n");
+	uint32_t instance = 0;
+	uint32_t chnGroup = 0;
+	uint8_t chn = 9;
+	adc_result = ADC16_TEST_OneTimeTrigger(instance, chnGroup, chn);
+	writeText("Run Sucessfully, returning:\n");
+	writeNumber((uint32_t)adc_result);
 
 	return 0;
 }
