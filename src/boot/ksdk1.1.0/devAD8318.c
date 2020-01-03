@@ -21,10 +21,13 @@ enum
 	kAD8318Pin	= GPIO_MAKE_PIN(HW_GPIOB, 0),
 };
 
-// Function copied from Kinetis SDK 1.1 API Reference Manual 
+// Function copied from Kinetis SDK 1.1 API Reference Manual
 void ADC16_TEST_OneTimeTrigger(uint32_t instance, uint32_t chnGroup, uint8_t chn)
 {
 #if FSL_FEATURE_ADC16_HAS_CALIBRATION
+	// The MKL03Z4 does have calibration and this is defined in line 85 of:
+	// Warp-firmware/tools/sdk/ksdk1.1.0/platform/CMSIS/Include/device/MKL03Z4/MKL03Z4_features.h
+	// Also have hardware averaging, 12 bit max resolution
 	adc16_calibration_param_t MyAdcCalibraitionParam;
 #endif // FSL_FEATURE_ADC16_HAS_CALIBRATION //
 
@@ -79,8 +82,10 @@ devAD8318init(void)
 	 */
 
 	PORT_HAL_SetMuxMode(PORTB_BASE, 0, kPortPinDisabled);
-	writeText("Setup PTB0 as ADC");
-
+	writeText("Setup PTB0 as ADC\n");
+	writeText("Running ADC Test:\n");
+	ADC16_TEST_OneTimeTrigger();
+	writeText("Run Sucessfully\n");
 
 	return 0;
 }
