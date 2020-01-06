@@ -176,12 +176,15 @@ writeText(char * text) {
 }
 
 void
-writeNumber(uint32_t number) {
-	uint32_t a= number;
+writeNumber(uint16_t number) {
+	// uint16_t a= number;
+	char text[4];
+	clearScreen();
+	textsize_x = 3;
+	textsize_y = 3;
 	// unsigned char text[10];
 	// itoa(a,(char*)text,10);
-	char text[10];
-  itoa(a,text,10);
+  itoa(number,text,4);
 	writeText(text);
 }
 
