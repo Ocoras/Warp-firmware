@@ -149,17 +149,17 @@ devAD8318init(void)
 	 *
 	 *	Using PTB0 for ADC measurement
 	 */
-	uint16_t power_result;
-
+	// uint16_t power_result;
+	clearScreen();
 	PORT_HAL_SetMuxMode(PORTB_BASE, 0, kPortPinDisabled);
 	writeText("Setup PTB0 as ADC\n");
 	MyChnConfig = initADC16(instance, chnGroup, chn);
 	writeText("Setup ADC Instance\n");
 	// writeText("Read value:\n");
-	while (1) {
-		power_result = readPower();
-		writeNumber(power_result);
-	}
+	// while (1) {
+	// 	power_result = readPower();
+	// 	writeNumber(power_result);
+	// }
 	// ADC16_DRV_Deinit(instance);
 	// adc_result = ADC16_OneTimeTrigger(instance, chnGroup, chn);
 

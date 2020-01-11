@@ -24,7 +24,8 @@ enum
 	kSSD1331PinCSn		= GPIO_MAKE_PIN(HW_GPIOB, 13),
 	kSSD1331PinDC		= GPIO_MAKE_PIN(HW_GPIOA, 12),
 	// kSSD1331PinRST		= GPIO_MAKE_PIN(HW_GPIOB, 0),
-	kSSD1331PinRST		= GPIO_MAKE_PIN(HW_GPIOA, 2),
+	kSSD1331PinRST		= GPIO_MAKE_PIN(HW_GPIOB, 3),
+	// kSSD1331PinRST		= GPIO_MAKE_PIN(HW_GPIOA, 2),
 };
 
 
@@ -222,7 +223,7 @@ devSSD1331init(void)
 	PORT_HAL_SetMuxMode(PORTB_BASE, 13u, kPortMuxAsGpio);
 	PORT_HAL_SetMuxMode(PORTA_BASE, 12u, kPortMuxAsGpio);
 	// PORT_HAL_SetMuxMode(PORTB_BASE, 0u, kPortMuxAsGpio);
-	PORT_HAL_SetMuxMode(PORTA_BASE, 2u, kPortMuxAsGpio);
+	PORT_HAL_SetMuxMode(PORTB_BASE, 3u, kPortMuxAsGpio);
 
 
 	/*
@@ -317,8 +318,8 @@ devSSD1331init(void)
 	// unsigned char txt2[] = "WARP";
 	// writeText(txt2);
 	writeText("WARP");
-	OSA_TimeDelay(500);
-	clearScreen();
+	// OSA_TimeDelay(500);
+	// clearScreen();
 	textsize_x = 1;
 	textsize_y = 1;
 
