@@ -213,7 +213,7 @@ plt.plot(
     data_to_be_fit_x,
     lin(data_to_be_fit_x, *popt),
     "-b",
-    label="ADC Reading = {:.1f} (True Power) - {:.1f}".format(*popt),
+    label="ADC Reading = {:.1f} (True Power) + {:.1f}".format(*popt),
 )
 plt.legend()
 

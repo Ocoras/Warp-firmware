@@ -32,5 +32,5 @@
 void printSensorDataAD8318(bool hexModeFlag);
 // #endif // __ADC16_TEST_H__ //
 
-
+void printPowerToScreen(void);
 int	devAD8318init(void);

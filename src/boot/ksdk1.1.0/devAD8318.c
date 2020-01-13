@@ -125,9 +125,9 @@ readADCValueOneShot(uint32_t instance, uint32_t chnGroup, uint8_t chn, adc16_chn
 	return MyAdcValue;
 }
 
-int32_t
+uint16_t
 readADC(void){
-	return readADCValueOneShot(instance, chnGroup, chn, MyChnConfig);
+	return (uint16_t)(readADCValueOneShot(instance, chnGroup, chn, MyChnConfig)&0x0FFFU);
 }
 
 uint16_t
@@ -139,17 +139,24 @@ readPower(void){
 	// x =  adcRaw /4095 * 3; // Raw reading into voltage
 	// x = 41.3 * x - 21.3 +0.5; // Numbers from linear model, +0.5 to assist with int casting
 	// return (uint16_t)(x);
-	adcRaw = (uint16_t)(readADC()&0x0FFFU);
-	x = ( adcRaw + 751.2 )/ (-33.5);
-	return (uint16_t)(x);
+	adcRaw = readADC();
+	x = ( adcRaw - 751.2f )/ (33.5f);
+	// x &= 0x0FFFU;
+	if (x > 100) {
+		return 99;
+	} else if (x< 0){
+		return 0;
+	} else {
+		return (uint16_t)x;
+	}
+
 }
 
 
 void
 printSensorDataAD8318(bool hexModeFlag) {
 	uint16_t adcValue;
-
-	adcValue = (uint16_t)(readADC()&0x0FFFU);
+	adcValue = readADC();
 	if (hexModeFlag)
 	{
 		SEGGER_RTT_printf(0, " 0x%02x,", adcValue);
@@ -159,6 +166,16 @@ printSensorDataAD8318(bool hexModeFlag) {
 		SEGGER_RTT_printf(0, " %d,", adcValue);
 	}
 }
+
+
+void
+printPowerToScreen(void) {
+	uint16_t power_result;
+	while (1) {
+		power_result = readPower();
+		writeNumber(power_result);
+	};
+};
 
 
 int

@@ -88,7 +88,8 @@
 #endif
 
 #define WARP_BUILD_ENABLE_SEGGER_RTT_PRINTF
-#define WARP_BUILD_BOOT_TO_CSVSTREAM
+// #define WARP_BUILD_BOOT_TO_CSVSTREAM
+#define WARP_BUILD_ENABLE_POWER_PRINTING
 
 
 /*
@@ -1338,7 +1339,9 @@ main(void)
 	devSSD1331init();
  	devAD8318init();
 
-
+#ifdef WARP_BUILD_ENABLE_POWER_PRINTING
+	printPowerToScreen();
+#endif
 #ifdef WARP_BUILD_BOOT_TO_CSVSTREAM
 	/*
 	 *	Force to printAllSensors
@@ -1353,7 +1356,7 @@ main(void)
 	 */
 #endif
 
-
+#ifndef WARP_BUILD_ENABLE_POWER_PRINTING
 	while (1)
 	{
 
@@ -2522,7 +2525,7 @@ main(void)
 			}
 		}
 	}
-
+#endif
 	return 0;
 }
 
