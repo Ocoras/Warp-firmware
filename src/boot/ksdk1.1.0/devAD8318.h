@@ -4,8 +4,9 @@
 // 	kAD8318DelaysHWFILL		= 3,
 // 	kAD8318DelaysHWLINE		= 1,
 // } AD8318Constants;
-
-
+#ifndef WARP_BUILD_ENABLE_DEVAD8318
+#define WARP_BUILD_ENABLE_DEVAD8318
+#endif
 // #ifndef __ADC16_TEST_H__
 // #define __ADC16_TEST_H__
 // #include
@@ -27,7 +28,8 @@
 // #define ADC16_TEST_LOOP_CYCLE (4U)
 
 // int32_t ADC16_TEST_OneTimeTrigger(uint32_t instance, uint32_t chnGroup, uint8_t chn);
-int32_t readADC();
+// int32_t readADC();
+void printSensorDataAD8318(bool hexModeFlag);
 // #endif // __ADC16_TEST_H__ //
 
 

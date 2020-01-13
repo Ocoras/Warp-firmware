@@ -82,13 +82,13 @@
 //#include "devRV8803C7.h"
 #else
 #include "devMMA8451Q.h"
-#include "devINA219.h"
+// #include "devINA219.h"
 #include "devSSD1331.h"
 #include "devAD8318.h"
 #endif
 
 #define WARP_BUILD_ENABLE_SEGGER_RTT_PRINTF
-//#define WARP_BUILD_BOOT_TO_CSVSTREAM
+#define WARP_BUILD_BOOT_TO_CSVSTREAM
 
 
 /*
@@ -1335,7 +1335,8 @@ main(void)
 	 *	TODO: initialize the kWarpPinKL03_VDD_ADC, write routines to read the VDD and temperature
 	 */
 
-
+	devSSD1331init();
+ 	devAD8318init();
 
 
 #ifdef WARP_BUILD_BOOT_TO_CSVSTREAM
@@ -1352,8 +1353,7 @@ main(void)
 	 */
 #endif
 
-	devSSD1331init();
-	devAD8318init();
+
 	while (1)
 	{
 
@@ -2726,6 +2726,9 @@ printAllSensors(bool printHeadersAndCalibration, bool hexModeFlag, int menuDelay
 		#endif
 		#ifdef WARP_BUILD_ENABLE_DEVINA219
 		printSensorDataINA219(hexModeFlag);
+		#endif
+		#ifdef WARP_BUILD_ENABLE_DEVAD8318
+		printSensorDataAD8318(hexModeFlag);
 		#endif
 
 

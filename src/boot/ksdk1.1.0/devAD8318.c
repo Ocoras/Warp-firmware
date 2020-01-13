@@ -134,12 +134,32 @@ uint16_t
 readPower(void){
 	uint16_t adcRaw;
 	float x;
-	// float negpower;
-	adcRaw = (uint16_t)(readADC()&0x0FFFU);//Performing bitmasking (ignoring sign value as not differential mode)
-	x =  adcRaw /4095 * 3; // Raw reading into voltage
-	x = 41.3 * x - 21.3 +0.5; // Numbers from linear model, +0.5 to assist with int casting
+	// // float negpower;
+	// adcRaw = (uint16_t)(readADC()&0x0FFFU);//Performing bitmasking (ignoring sign value as not differential mode)
+	// x =  adcRaw /4095 * 3; // Raw reading into voltage
+	// x = 41.3 * x - 21.3 +0.5; // Numbers from linear model, +0.5 to assist with int casting
+	// return (uint16_t)(x);
+	adcRaw = (uint16_t)(readADC()&0x0FFFU);
+	x = ( adcRaw + 751.2 )/ (-33.5);
 	return (uint16_t)(x);
 }
+
+
+void
+printSensorDataAD8318(bool hexModeFlag) {
+	uint16_t adcValue;
+
+	adcValue = (uint16_t)(readADC()&0x0FFFU);
+	if (hexModeFlag)
+	{
+		SEGGER_RTT_printf(0, " 0x%02x,", adcValue);
+	}
+	else
+	{
+		SEGGER_RTT_printf(0, " %d,", adcValue);
+	}
+}
+
 
 int
 devAD8318init(void)
