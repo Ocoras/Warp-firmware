@@ -1,5 +1,4 @@
 #include <stdint.h>
-
 #include "fsl_port_hal.h"
 #include "fsl_adc16_driver.h"
 
@@ -130,7 +129,7 @@ readADC(void){
 	return (uint16_t)(readADCValueOneShot(instance, chnGroup, chn, MyChnConfig)&0x0FFFU);
 }
 
-uint16_t
+float
 readPower(void){
 	uint16_t adcRaw;
 	float x;
@@ -140,14 +139,14 @@ readPower(void){
 	// x = 41.3 * x - 21.3 +0.5; // Numbers from linear model, +0.5 to assist with int casting
 	// return (uint16_t)(x);
 	adcRaw = readADC();
-	x = ( adcRaw - 751.2f )/ (33.5f);
-	// x &= 0x0FFFU;
+	x = ( adcRaw - 749.3f )/ (-33.6f);
+	// x = 78.2f;
 	if (x > 100) {
 		return 99;
-	} else if (x< 0){
-		return 0;
+	} else if (x< -99){
+		return -99;
 	} else {
-		return (uint16_t)x;
+		return x;
 	}
 
 }
@@ -170,10 +169,17 @@ printSensorDataAD8318(bool hexModeFlag) {
 
 void
 printPowerToScreen(void) {
-	uint16_t power_result;
+	float power_result;
+	// char power_string[10];
+
 	while (1) {
 		power_result = readPower();
-		writeNumber(power_result);
+		// sprintf(power_string,"%f",power_result);
+		// writeText(power_string);
+		writeFloat(power_result);
+		writeText("dBm");
+		OSA_TimeDelay(300);
+		clearScreen();
 	};
 };
 
@@ -187,11 +193,17 @@ devAD8318init(void)
 	 *	Using PTB0 for ADC measurement
 	 */
 	// uint16_t power_result;
-	clearScreen();
+
 	PORT_HAL_SetMuxMode(PORTB_BASE, 0, kPortPinDisabled);
+#ifdef WARP_BUILD_ENABLE_POWER_PRINTING
+	clearScreen();
 	writeText("Setup PTB0 as ADC\n");
+#endif
 	MyChnConfig = initADC16(instance, chnGroup, chn);
+#ifdef WARP_BUILD_ENABLE_POWER_PRINTING
 	writeText("Setup ADC Instance\n");
+	clearScreen();
+#endif
 	// writeText("Read value:\n");
 	// while (1) {
 	// 	power_result = readPower();

@@ -47,7 +47,8 @@ typedef enum
 
 int	devSSD1331init(void);
 void writeText(char * text);
-void writeNumber(uint16_t number);
+void writeNumber(int16_t number);
+void writeFloat(float n);
 void clearScreen(void);
 // void writeText(uint8_t c);
 

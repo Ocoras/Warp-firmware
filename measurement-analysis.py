@@ -153,52 +153,94 @@ signal_generator_output_levels = [
     -50.39,
     -55.39,
     -60.35,
+    -65.26,
 ]
-
-signal_generator_output_levels_index = 0
 
 single_power_measurement_vals = []
 a = []
-prev_mean = 0
-number_of_dud_levels = 0
+
 
 data_to_be_fit_x = []
 data_to_be_fit_y = []
 
+
+# real_measurements[39456]
+auto_index_finish = 0
+# Separating the different power measurements using threshold on gradient
+measurement_index = 0
 for i, grad in enumerate(grad_measurements):
     a.append(real_measurements[i])
     if grad > 140:
-
         b = np.array(deepcopy(a))
-        mean_val = np.mean(b)
         a = []
 
-        if mean_val - prev_mean > 3:
+        if measurement_index < 10:
             single_power_measurement_vals.append(b)
-            print(b)
-            print("Mean ADC Value: {}".format(mean_val))
-            plt.figure(1)
-            plt.annotate("{:.0f}".format(mean_val), (i, real_measurements[i]))
-
-            data_to_be_fit_x.append(
-                signal_generator_output_levels[signal_generator_output_levels_index]
+            print(
+                "Saving at index: {:5} = {: 4.2f}dBm Mean ADC Value: {:04.0f}".format(
+                    i, signal_generator_output_levels[measurement_index], np.mean(b)
+                )
             )
-            data_to_be_fit_y.append(mean_val)
-
-            signal_generator_output_levels_index += 1
-
-            prev_mean = mean_val
+            plt.figure(1)
+            plt.plot(i, real_measurements[i], "or")
+            plt.annotate("{:.0f}".format(np.mean(b)), (i, real_measurements[i]))
+            measurement_index += 1
+            auto_index_finish = i
         else:
-            number_of_dud_levels += 1
             break
+
+# Manually splice last two values since they are very noisy
+end_55 = 39455
+end_60 = 45090
+
+# 55
+plt.plot(auto_index_finish + 1, real_measurements[auto_index_finish + 1], "og")
+plt.plot(end_55, real_measurements[end_55], "og")
+b = np.array(real_measurements[auto_index_finish + 1 : end_55 + 1])
+
+assert b[-1] == real_measurements[end_55]
+single_power_measurement_vals.append(b)
+
+
+# 60
+plt.plot(end_55 + 1, real_measurements[end_55 + 1], "og")
+plt.plot(end_60, real_measurements[end_60], "og")
+
+b = np.array(real_measurements[end_55 + 1 : end_60 + 1])
+single_power_measurement_vals.append(b)
+# 65
+plt.plot(end_60 + 1, real_measurements[end_60 + 1], "og")
+plt.plot(len(real_measurements), real_measurements[-1], "og")
+b = np.array(real_measurements[end_60 + 1 :])
+
+single_power_measurement_vals.append(b)
+
 
 plt.figure(2)
 plt.title("Average Measured ADC Values vs True Signal Power")
 plt.ylabel("Raw ADC Reading [N/A]")
 plt.xlabel("True Signal Power [dBm]")
+
+y_err = np.empty((2, len(single_power_measurement_vals)))
+
+for i, vals in enumerate(single_power_measurement_vals):
+    data_to_be_fit_x.append(signal_generator_output_levels[i])
+    data_to_be_fit_y.append(np.mean(vals))
+
+    y_err[0, i] = np.mean(vals) - np.amin(vals)
+    y_err[1, i] = np.amax(vals) - np.mean(vals)
+    print(
+        "Reading at {: 4.2f}dBm, Minimum data point at index {}, length {}".format(
+            signal_generator_output_levels[i],
+            np.where(vals == np.amin(vals)),
+            len(vals),
+        )
+    )
+
+
 data_to_be_fit_x = np.array(data_to_be_fit_x)
 data_to_be_fit_y = np.array(data_to_be_fit_y)
-plt.plot(data_to_be_fit_x, data_to_be_fit_y, "r+")
+plt.errorbar(data_to_be_fit_x, data_to_be_fit_y, yerr=y_err, fmt="r+")
 
 
 def lin(x, m, c):
@@ -206,9 +248,9 @@ def lin(x, m, c):
 
 
 # assuming ydata = f(xdata, *params)
-popt, pcov = curve_fit(lin, data_to_be_fit_x, data_to_be_fit_y)
-
-print(popt)
+popt, pcov = curve_fit(lin, data_to_be_fit_x[:-3], data_to_be_fit_y[:-3])
+# print(data_to_be_fit_x[:-3])
+print("Gradient: {}, Intercept: {}".format(*popt))
 plt.plot(
     data_to_be_fit_x,
     lin(data_to_be_fit_x, *popt),
@@ -218,9 +260,14 @@ plt.plot(
 plt.legend()
 
 
-# plt.figure(3)
+plt.figure(3)
+plt.hist(single_power_measurement_vals[-3], bins=20)
+plt.figure(4)
+plt.hist(single_power_measurement_vals[-2], bins=20)
+plt.figure(5)
+plt.hist(single_power_measurement_vals[-1], bins=20)
 # single_power_measurement_vals = np.array(single_power_measurement_vals)
-# print(single_power_measurement_vals)
+
 # plt.hist(
 #     single_power_measurement_vals,
 #     rwidth=1,

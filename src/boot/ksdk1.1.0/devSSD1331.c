@@ -176,19 +176,111 @@ writeText(char * text) {
 
 }
 
+// Implementation of float to str from https://www.geeksforgeeks.org/convert-floating-point-number-string/
+
+
+// Reverses a string 'str' of length 'len'
+void reverse(char* str, int len)
+{
+    int i = 0, j = len - 1, temp;
+    while (i < j) {
+        temp = str[i];
+        str[i] = str[j];
+        str[j] = temp;
+        i++;
+        j--;
+    }
+}
+
+// Converts a given integer x to string str[].
+// d is the number of digits required in the output.
+// If d is more than the number of digits in x,
+// then 0s are added at the beginning.
+int intToStr(int x, char str[], int d)
+{
+    int i = 0;
+    while (x) {
+        str[i++] = (x % 10) + '0';
+        x = x / 10;
+    }
+
+    // If number of digits required is more, then
+    // add spaces at the beginning - removed as not desired behaviour
+    // while (i < d)
+    //     str[i++] = ' ';
+
+    reverse(str, i);
+    str[i] = '\0';
+    return i;
+}
+
+// Converts a floating-point/double number to a string.
+void ftoa(float n, char* res)
+{
+    // Extract integer part
+    int ipart = (int)n;
+
+    // Extract floating part
+    float fpart = n - (float)ipart;
+
+    // convert integer part to string
+    int i = intToStr(ipart, res, 0);
+
+    // check for display option after point
+
+    res[i] = '.'; // add dot
+
+    // Get the value of fraction part upto given no.
+    // of points after dot. The third parameter
+    // is needed to handle cases like 233.007
+    fpart = fpart * 100;
+
+    intToStr((int)fpart, res + i + 1, 2);
+
+}
+
 void
-writeNumber(uint16_t number) {
-	// uint16_t a= number;
-	char text[4];
-	clearScreen();
-	textsize_x = 3;
-	textsize_y = 3;
+writeNumber(int16_t number) {
+	char text[5];
+	// clearScreen();
+	if (number < 0){
+		writeText("-");
+		number = -number;
+	}
+	// textsize_x = 3;
+	// textsize_y = 3;
 	// unsigned char text[10];
 	// itoa(a,(char*)text,10);
-  itoa(number,text,4);
+  // itoa(number,text,5);
+	intToStr(number,text,5);
 	writeText(text);
 }
 
+void
+writeFloat(float n) {
+	// Expect up to 9999.99
+	// char text[7];
+	// int ipart = (int)n;
+	//
+	// float fpart= n - (float)ipart;
+	// if (fpart < 0) {
+	// 	fpart = - fpart;
+	// }
+	// fpart = fpart * 100;
+	// writeNumber(ipart);
+	// writeText(".");
+	// writeNumber( (int16_t)fpart );
+	char res[20];
+	// SEGGER_RTT_printf(0,"Attempting To Print\n");
+	if (n<0){
+		writeText("-");
+		SEGGER_RTT_WriteString(0,"-");
+		n = -n;
+	}
+	ftoa(n,res);
+	SEGGER_RTT_printf(0,"%s\n",res);
+	writeText(res);
+}
 
 void
 clearScreen(void) {

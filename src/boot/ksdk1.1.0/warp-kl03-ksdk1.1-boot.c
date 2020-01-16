@@ -193,7 +193,11 @@ volatile lpuart_state_t 			lpuartState;
  */
 volatile uint32_t			gWarpI2cBaudRateKbps		= 200;
 volatile uint32_t			gWarpUartBaudRateKbps		= 1;
+// #ifdef WARP_BUILD_ENABLE_POWER_PRINTING
+// volatile uint32_t			gWarpSpiBaudRateKbps		= 200;
+// #else
 volatile uint32_t			gWarpSpiBaudRateKbps		= 200;
+// #endif
 volatile uint32_t			gWarpSleeptimeSeconds		= 0;
 volatile WarpModeMask			gWarpMode			= kWarpModeDisableAdcOnSleep;
 volatile uint32_t			gWarpI2cTimeoutMilliseconds	= 5;
