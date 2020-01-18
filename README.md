@@ -5,7 +5,7 @@ This fork belongs to David Swarbrick, `djgs2`, Churchill College, University of 
 
 This fork of the Warp Firmware for an FRDM KL03 board implements the use of an AD8318 RF Logarithmic Power Measurement IC connected to GPIO Pin PTB0. Although not added to the Warp menu (due to lacking SPI or I2C interfaces and thus there being few configuration options), the raw ADC reading of PTB0 will be printed when the function `printAllSensors` is called, thus allowing the use of the compiler directive `WARP_BUILD_BOOT_TO_CSVSTREAM` to collect data via a logging interface such as `JLinkLogger`.
 
-<img src="ad8318-picture.jpg" alt="A picture of the AD8318 wired to FRDM KL03" width="200"/>
+<img src="ad8318-picture.jpg" alt="A picture of the AD8318 wired to FRDM KL03" width="500"/>
 
 
 This fork also supports a screen implementation based on an SSD1331 connected as follows:
