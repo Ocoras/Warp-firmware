@@ -133,14 +133,10 @@ float
 readPower(void){
 	uint16_t adcRaw;
 	float x;
-	// // float negpower;
-	// adcRaw = (uint16_t)(readADC()&0x0FFFU);//Performing bitmasking (ignoring sign value as not differential mode)
-	// x =  adcRaw /4095 * 3; // Raw reading into voltage
-	// x = 41.3 * x - 21.3 +0.5; // Numbers from linear model, +0.5 to assist with int casting
-	// return (uint16_t)(x);
 	adcRaw = readADC();
+	// Calculate True Power using best fit line
 	x = ( adcRaw - 749.3f )/ (-33.6f);
-	// x = 78.2f;
+	// Limit to sensible values
 	if (x > 100) {
 		return 99;
 	} else if (x< -99){
@@ -152,6 +148,7 @@ readPower(void){
 }
 
 
+// Used for integration with WARP firmware
 void
 printSensorDataAD8318(bool hexModeFlag) {
 	uint16_t adcValue;
@@ -192,10 +189,10 @@ devAD8318init(void)
 	 *
 	 *	Using PTB0 for ADC measurement
 	 */
-	// uint16_t power_result;
 
 	PORT_HAL_SetMuxMode(PORTB_BASE, 0, kPortPinDisabled);
 #ifdef WARP_BUILD_ENABLE_POWER_PRINTING
+	// If printing output to the screen, print initilisation status.
 	clearScreen();
 	writeText("Setup PTB0 as ADC\n");
 #endif
@@ -204,14 +201,6 @@ devAD8318init(void)
 	writeText("Setup ADC Instance\n");
 	clearScreen();
 #endif
-	// writeText("Read value:\n");
-	// while (1) {
-	// 	power_result = readPower();
-	// 	writeNumber(power_result);
-	// }
-	// ADC16_DRV_Deinit(instance);
-	// adc_result = ADC16_OneTimeTrigger(instance, chnGroup, chn);
 
-	//
 	return 0;
 }

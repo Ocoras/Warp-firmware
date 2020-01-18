@@ -28,9 +28,11 @@ enum
 	// kSSD1331PinRST		= GPIO_MAKE_PIN(HW_GPIOA, 2),
 };
 
-
-uint8_t width = 0x5F;
-uint8_t height = 0x3F;
+// Useful variables to note, not used in this implementation
+// static const uint8_t WIDTH = 0x5F;
+// static const uint8_t HIEGHT = 0x3F;
+static const uint8_t width = 0x5F;
+static const uint8_t height = 0x3F;
 uint8_t cursor_x = 0;
 uint8_t cursor_y = 0;
 uint8_t textsize_x = 1;
@@ -55,6 +57,7 @@ writeCommand(uint8_t commandByte)
 	 *	Make sure there is a high-to-low transition by first driving high, delay, then drive low.
 	 */
 	GPIO_DRV_SetPinOutput(kSSD1331PinCSn);
+	// Speed up by removing time delay, could cause instability but none found in testing.
 	// OSA_TimeDelay(1);
 	GPIO_DRV_ClearPinOutput(kSSD1331PinCSn);
 
@@ -81,8 +84,6 @@ writeCommand(uint8_t commandByte)
 
 
 
-// static const uint8_t WIDTH = 0x5F;
-// static const uint8_t HIEGHT = 0x3F;
 
 void
 drawLine(uint8_t start_x, uint8_t start_y, uint8_t end_x, uint8_t end_y, uint8_t * colours){
@@ -205,7 +206,7 @@ int intToStr(int x, char str[], int d)
     }
 
     // If number of digits required is more, then
-    // add spaces at the beginning - removed as not desired behaviour
+    // add spaces at the beginning - removed as not desired behaviour in our case
     // while (i < d)
     //     str[i++] = ' ';
 
@@ -241,47 +242,39 @@ void ftoa(float n, char* res)
 
 void
 writeNumber(int16_t number) {
+	// Setup buffer for text output
 	char text[5];
-	// clearScreen();
 	if (number < 0){
+		// print negative sign if required
 		writeText("-");
 		number = -number;
 	}
-	// textsize_x = 3;
-	// textsize_y = 3;
-	// unsigned char text[10];
-	// itoa(a,(char*)text,10);
+	// Alternative is to use standard library itoa function:
   // itoa(number,text,5);
+	// Write number into the buffer, size 5
 	intToStr(number,text,5);
 	writeText(text);
 }
 
 void
 writeFloat(float n) {
-	// Expect up to 9999.99
-	// char text[7];
-	// int ipart = (int)n;
-	//
-	// float fpart= n - (float)ipart;
-	// if (fpart < 0) {
-	// 	fpart = - fpart;
-	// }
-	// fpart = fpart * 100;
-	// writeNumber(ipart);
-	// writeText(".");
-	// writeNumber( (int16_t)fpart );
+	// Setup buffer
 	char res[20];
-	// SEGGER_RTT_printf(0,"Attempting To Print\n");
+	// SEGGER_RTT_printf(0,"Attempting To Print\n"); - used for debugging
 	if (n<0){
+		// Print negative sign
 		writeText("-");
 		SEGGER_RTT_WriteString(0,"-");
 		n = -n;
 	}
+	// Run float conversion to string, we assume only 2 decimal places
+	// due to line of best fit accuracy, could be adjusted for more general case
 	ftoa(n,res);
 	SEGGER_RTT_printf(0,"%s\n",res);
 	writeText(res);
 }
 
+// Wrapper to clear the screen
 void
 clearScreen(void) {
 	writeCommand(kSSD1331CommandCLEAR);
@@ -396,7 +389,7 @@ devSSD1331init(void)
 		/*
 		 *	Any post-initialization drawing commands go here.
 		 */
-
+  // Set text colour to be white on black for ease
 	textcolor[0] = 0x3E ;
 	textcolor[1] = 0x3E ;
 	textcolor[2] = 0x3E ;
@@ -404,14 +397,11 @@ devSSD1331init(void)
 	textbg[1] = 0x00;
 	textbg[2] = 0x00;
 
-
 	textsize_x=3;
 	textsize_y=4;
-	// unsigned char txt2[] = "WARP";
-	// writeText(txt2);
+	// Loading text
 	writeText("WARP");
-	// OSA_TimeDelay(500);
-	// clearScreen();
+	// Reset text size for fast writing
 	textsize_x = 1;
 	textsize_y = 1;
 

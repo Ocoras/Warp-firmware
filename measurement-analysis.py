@@ -25,7 +25,7 @@
 # 1.08dB (at 867.5MHz)
 # 1.08dB (at 867.5MHz)
 # 1.08dB (at 867.5MHz)
-
+# 1.076666667 average
 # Cable 2 (green marker big and not fixed) loss:
 # 1.16dB (at 867.5MHz)
 # 1.16dB (at 867.5MHz)
@@ -38,8 +38,9 @@
 # 1.14dB (at 865.9MHz)
 # 1.14dB (at 865.9MHz)
 # 1.15dB (at 865.9MHz)
+# 1.151818182 average
 
-
+# 0.0751dB difference
 # setup
 
 #       WARP ---- cable 1 ------ splitter ------- cable 2 -------- spectrum analyser
@@ -96,6 +97,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from copy import deepcopy
 from scipy.optimize import curve_fit
+import scipy.stats as stats
 
 f = open("Mon13Jan1429_test_865.9MHz.log")
 print("Opened Measurements")
@@ -137,7 +139,10 @@ real_measurements = np.array(real_measurements)
 grad_measurements = np.diff(real_measurements)
 plt.figure(1)
 plt.plot(range(len(real_measurements)), real_measurements)
-plt.plot(range(len(grad_measurements)), grad_measurements)
+plt.title("Raw Measurements Taken")
+plt.xlabel("Measurement Number")
+plt.ylabel("ADC Value")
+# plt.plot(range(len(grad_measurements)), grad_measurements)
 
 
 signal_generator_output_levels = [
@@ -183,7 +188,11 @@ for i, grad in enumerate(grad_measurements):
             )
             plt.figure(1)
             plt.plot(i, real_measurements[i], "or")
-            plt.annotate("{:.0f}".format(np.mean(b)), (i, real_measurements[i]))
+            # plt.annotate("{:.0f}".format(np.mean(b)), (i, real_measurements[i]))
+            plt.annotate(
+                "{}dBm".format(signal_generator_output_levels[measurement_index]),
+                (i, real_measurements[i]),
+            )
             measurement_index += 1
             auto_index_finish = i
         else:
@@ -261,11 +270,72 @@ plt.legend()
 
 
 plt.figure(3)
-plt.hist(single_power_measurement_vals[-3], bins=20)
+
+plt.hist(
+    single_power_measurement_vals[-3:],
+    bins=range(
+        min(single_power_measurement_vals[-3]), max(single_power_measurement_vals[-1])
+    ),
+    width=1,
+)
+plt.title("Histogram of Measurements for -55.39 ,-60.35 -65.26dBm")
+plt.xlabel("ADC Value")
+plt.ylabel("Occurence")
 plt.figure(4)
-plt.hist(single_power_measurement_vals[-2], bins=20)
-plt.figure(5)
-plt.hist(single_power_measurement_vals[-1], bins=20)
+
+# 5 % Hypothesis Test
+alpha = 0.05
+print(len(signal_generator_output_levels))
+# enumerate(single_power_measurement_vals[:-3]):
+for j, good_measurements in enumerate(single_power_measurement_vals[-3:]):
+    i = j + 10
+    stat, pvalue = stats.normaltest(good_measurements)
+    mean = np.mean(good_measurements)
+    std = np.std(good_measurements)
+    name = "{: 4.2f}dBm".format(signal_generator_output_levels[i])
+    normal = pvalue < alpha
+    print(
+        "For {:>9} measurements: n={:5d} mean={:4.0f} std={:4.2f}, Normal Fit: {} stat={} pvalue={} ".format(
+            name, len(good_measurements), mean, std, normal, stat, pvalue
+        )
+    )
+    plt.hist(
+        good_measurements,
+        bins=range(int(mean) - 100, int(mean) + 100),
+        width=1,
+        label="{}dBm".format(signal_generator_output_levels[i]),
+        density=True,
+    )
+    if normal:
+        x = np.linspace(mean - 3 * std, mean + 3 * std, 100)
+        y = stats.norm.pdf(x, loc=mean, scale=std)
+        plt.plot(
+            x,
+            y,
+            "r",
+            label="{}dBm Normal Fit".format(signal_generator_output_levels[i]),
+        )
+    # zero_mean = good_measurements - np.mean(good_measurements)
+    # # n = len(good_measurements)
+    # # S = np.std(good_measurements, ddof=1)
+    # # t_dist = zero_mean / (S / np.sqrt(n))
+    # s = np.std(good_measurements)
+    # dist = zero_mean / s
+    #
+    # plt.hist(
+    #     dist,
+    #     bins=np.linspace(-3, 3, 40),
+    #     # bins=range(int(np.floor(min(t_dist))), int(np.ceil(max(t_dist)))),
+    #     label="{}dBm".format(signal_generator_output_levels[i]),
+    # )
+plt.title("Histogram of Noisiest Measurements")
+plt.xlabel("ADC Value")
+plt.ylabel("Occurence")
+plt.legend()
+# plt.figure(4)
+# plt.hist(single_power_measurement_vals[-2], bins=50)
+# plt.figure(5)
+# plt.hist(single_power_measurement_vals[-1], bins=50)
 # single_power_measurement_vals = np.array(single_power_measurement_vals)
 
 # plt.hist(
