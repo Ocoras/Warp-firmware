@@ -191,16 +191,14 @@ devAD8318init(void)
 	 */
 
 	PORT_HAL_SetMuxMode(PORTB_BASE, 0, kPortPinDisabled);
-#ifdef WARP_BUILD_ENABLE_POWER_PRINTING
-	// If printing output to the screen, print initilisation status.
+
+	// Print initilisation status.
 	clearScreen();
 	writeText("Setup PTB0 as ADC\n");
-#endif
 	MyChnConfig = initADC16(instance, chnGroup, chn);
-#ifdef WARP_BUILD_ENABLE_POWER_PRINTING
 	writeText("Setup ADC Instance\n");
 	clearScreen();
-#endif
+
 
 	return 0;
 }
